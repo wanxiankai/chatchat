@@ -1,9 +1,11 @@
-import Image from 'next/image'
+import Main from '@/components/home/Main'
+import Navigation from '@/components/home/Navigation'
 
 export default function Home() {
   return (
-    <main className='bg-yellow-500 p-10'>
-      <h1>Hello Next</h1>
-    </main>
+    <div className='bg-yellow-500 p-10'>
+      <Main/>
+      <Navigation/>
+    </div>
   )
 }
