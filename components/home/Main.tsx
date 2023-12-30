@@ -1,3 +1,3 @@
 export default function Main(){
-    return <main>内容</main>
+    return <main className="flex-1 bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">内容</main>
 }
