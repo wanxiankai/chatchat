@@ -3,9 +3,9 @@ import Navigation from '@/components/home/Navigation'
 
 export default function Home() {
   return (
-    <div className='bg-yellow-500 p-10'>
-      <Main/>
+    <div className='h-full flex'>
       <Navigation/>
+      <Main/>
     </div>
   )
 }
