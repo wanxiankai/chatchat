@@ -1,3 +1,4 @@
+import MarkDown from "@/components/common/MarkDown"
 import { Message } from "@/types/chat"
 import { SiOpenai } from 'react-icons/si'
 
@@ -44,7 +45,7 @@ export default function MessageList() {
                                 <div className="text-3xl leading-[1]">
                                     {isUser ? "😊" : <SiOpenai />}
                                 </div>
-                                <div className="flex-1">{message.content}</div>
+                                <div className="flex-1"><MarkDown>{message.content}</MarkDown></div>
                             </div>
                         </li>
                     )
