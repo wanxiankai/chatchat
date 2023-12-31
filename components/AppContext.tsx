@@ -19,17 +19,12 @@ export function useAppContext() {
 
 export default function AppContextProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState({ displayNavigation: true })
-    const [test, setTest] = useState(true)
-    console.log("AppContextProvider")
     const contextValue = useMemo(() => {
         return { state, setState }
     }, [state, setState])
 
     return (
-        <AppContext.Provider value={{ state, setState }}>
-            <button onClick={() => {
-                setTest((v) => !v )
-                }}>Test</button>
+        <AppContext.Provider value={ contextValue}>
             {children}
         </AppContext.Provider>
     )
