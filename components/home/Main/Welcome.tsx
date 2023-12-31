@@ -1,3 +1,4 @@
+import Example from "./Example";
 import ModelSelect from "./ModelSelect";
 
 export default function Welcome(){
@@ -7,6 +8,7 @@ export default function Welcome(){
             <h1 className="mt-20 text-4xl font-bold">
                 ChatGPT免费使用 - GPT4 & GPT3.5-turbo
             </h1>
+            <Example/>
         </div>
     )
 }
