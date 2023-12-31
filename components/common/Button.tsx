@@ -4,7 +4,7 @@ import { IconType } from 'react-icons'
 type ButtonProps = {
     icon?: IconType
     // 风格 default: 带背景不带边框  | outline: 带背景也带边框 
-    variant: 'default' | 'outline' | 'text'
+    variant?: 'default' | 'outline' | 'text'
 } & ComponentPropsWithoutRef<'button'>
 
 export default function Button({
