@@ -1,8 +1,10 @@
+import { useAppContext } from "@/components/AppContext";
 import Button from "@/components/common/Button";
 import { HiPlus } from 'react-icons/hi';
 import { LuPanelLeft } from 'react-icons/lu';
 
 export default function MenuBar() {
+    const { setState } = useAppContext()
     return (
         <div className="flex space-x-3">
             <Button
@@ -15,6 +17,11 @@ export default function MenuBar() {
             <Button
                 icon={LuPanelLeft}
                 variant="outline"
+                onClick={() => {
+                    setState((v) => {
+                        return { ...v, displayNavigation: false }
+                    })
+                }}
             />
         </div>)
 }
