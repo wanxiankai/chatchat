@@ -3,7 +3,7 @@ import MarkDown from "@/components/common/MarkDown"
 import { SiOpenai } from 'react-icons/si'
 
 export default function MessageList() {
-    const { state: { messageList } } = useAppContext();
+    const { state: { messageList, streamingId } } = useAppContext();
     return (
         <div className="w-full pt-10 pb-48 dark:text-gray-300">
             <ul>
@@ -21,7 +21,7 @@ export default function MessageList() {
                                 <div className="text-3xl leading-[1]">
                                     {isUser ? "😊" : <SiOpenai />}
                                 </div>
-                                <div className="flex-1"><MarkDown>{message.content}</MarkDown></div>
+                                <div className="flex-1"><MarkDown>{`${message.content}${message.id === streamingId  ? '▍' : ''}`}</MarkDown></div>
                             </div>
                         </li>
                     )
