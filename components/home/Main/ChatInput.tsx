@@ -8,8 +8,33 @@ import { useState } from "react";
 export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
 
-    function sendMessage(){
+    async function sendMessage(){
         console.log('发送消息', messageText)
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({messageText})
+        })
+        if(!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        if(!response.body){
+            console.log("body error")
+            return
+        }
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder()
+        let done = false;
+        while(!done) {
+            const result = await reader.read()
+            done = result.done
+            const chunk = decoder.decode(result.value)
+            console.log(chunk)
+        }
+        setMessageText('')
     }
     return (
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-b from-[rgba(255,255,255,0)] from-[13.94%] to-[#fff] to-[54.73%] pt-10 dark:from-[rgba(53,55,64,0)] dark:to-[#353740] dark:to-[58.85%]">
