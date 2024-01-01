@@ -4,7 +4,6 @@ import { PiLightningFill, PiStopBold } from 'react-icons/pi'
 import { FiSend } from 'react-icons/fi'
 import TextareaAutoSize from 'react-textarea-autosize'
 import { useRef, useState } from "react";
-import { v4 as uuidV4 } from "uuid"
 import { Message, MessageRequestBody } from "@/types/chat";
 import { useAppContext } from "@/components/AppContext";
 import { ActionType } from "@/reducers/AppReducer";
@@ -13,6 +12,7 @@ export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
     const { state: { messageList, currentModel, streamingId }, dispatch } = useAppContext()
     const stopRef = useRef(false)
+    const chatIdRef = useRef('')
 
     async function createOrUpdateMessage(message: Message) {
         const response = await fetch("/api/message/update", {
@@ -27,7 +27,25 @@ export default function ChatInput() {
             return
         }
         const { data } = await response.json()
+        if (!chatIdRef.current) {
+            chatIdRef.current = data.message.chatId
+        }
         return data.message
+    }
+
+    async function deleteMessage(id: string) {
+        const response = await fetch(`/api/message/delete?id=${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        if (!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        const { code } = await response.json()
+        return code === 0
     }
 
     async function sendMessage() {
@@ -35,7 +53,7 @@ export default function ChatInput() {
             id: '',
             role: 'user',
             content: messageText,
-            chatId: ''
+            chatId: chatIdRef.current
         })
         const messages = messageList.concat([currentMessage]);
         // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
@@ -46,6 +64,11 @@ export default function ChatInput() {
     async function reSendMessage() {
         const messages = [...messageList];
         if (messages.length !== 0 && messages[messages.length - 1].role === 'assistant') {
+            const result = await deleteMessage(messages[messages.length - 1].id)
+            if (!result) {
+                console.log('删除消息失败！')
+                return;
+            }
             dispatch({ type: ActionType.REMOVE_MESSAGE, message: messages[messages.length - 1] })
         }
         messages.splice(messages.length - 1, 1)
@@ -73,12 +96,12 @@ export default function ChatInput() {
             console.log("body error")
             return
         }
-        const responseMessage: Message = {
-            id: uuidV4(),
+        const responseMessage: Message = await createOrUpdateMessage({
+            id: '',
             role: 'assistant',
             content: '',
-            chatId:''
-        }
+            chatId: chatIdRef.current
+        })
 
         dispatch({ type: ActionType.ADD_MESSAGE, message: responseMessage })
         dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: responseMessage.id })
@@ -99,6 +122,7 @@ export default function ChatInput() {
             content += chunk
             dispatch({ type: ActionType.UPDATE_MESSAGE, message: { ...responseMessage, content } })
         }
+        createOrUpdateMessage({ ...responseMessage, content })
         dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: '' })
         // setMessageText('')
     }
