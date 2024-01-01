@@ -14,25 +14,41 @@ export default function ChatInput() {
     const { state: { messageList, currentModel, streamingId }, dispatch } = useAppContext()
     const stopRef = useRef(false)
 
+    async function createOrUpdateMessage(message: Message) {
+        const response = await fetch("/api/message/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(message)
+        })
+        if (!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        const { data } = await response.json()
+        return data.message
+    }
 
     async function sendMessage() {
-        const currentMessage: Message = {
-            id: uuidV4(),
+        const currentMessage = await createOrUpdateMessage({
+            id: '',
             role: 'user',
-            content: messageText
-        }
+            content: messageText,
+            chatId: ''
+        })
         const messages = messageList.concat([currentMessage]);
-         // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
-         dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
+        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
+        dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
         toSend(messages)
     }
 
     async function reSendMessage() {
         const messages = [...messageList];
-        if(messages.length !== 0 && messages[messages.length -1].role === 'assistant'){
-            dispatch({type:ActionType.REMOVE_MESSAGE, message: messages[messages.length -1]})
+        if (messages.length !== 0 && messages[messages.length - 1].role === 'assistant') {
+            dispatch({ type: ActionType.REMOVE_MESSAGE, message: messages[messages.length - 1] })
         }
-        messages.splice(messages.length-1,1)
+        messages.splice(messages.length - 1, 1)
         toSend(messages)
     }
 
@@ -60,7 +76,8 @@ export default function ChatInput() {
         const responseMessage: Message = {
             id: uuidV4(),
             role: 'assistant',
-            content: ''
+            content: '',
+            chatId:''
         }
 
         dispatch({ type: ActionType.ADD_MESSAGE, message: responseMessage })
