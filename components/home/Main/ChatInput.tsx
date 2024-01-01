@@ -11,7 +11,7 @@ import { ActionType } from "@/reducers/AppReducer";
 
 export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
-    const { state: { messageList, currentModel }, dispatch } = useAppContext()
+    const { state: { messageList, currentModel, streamingId }, dispatch } = useAppContext()
 
     async function sendMessage() {
         console.log('发送消息', messageText)
@@ -24,7 +24,7 @@ export default function ChatInput() {
         const messages = messageList.concat([currentMessage]);
         const requestBody: MessageRequestBody = { messages, model: currentModel }
         // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
-        dispatch({type: ActionType.ADD_MESSAGE, message: currentMessage})
+        dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
         setMessageText('')
 
         const response = await fetch("/api/chat", {
@@ -44,12 +44,12 @@ export default function ChatInput() {
         }
         const responseMessage: Message = {
             id: uuidV4(),
-            role:'assistant',
+            role: 'assistant',
             content: ''
         }
 
-        dispatch({type: ActionType.ADD_MESSAGE, message: responseMessage})
-        dispatch({type: ActionType.UPDATE, fiel:'streamingId', value: responseMessage.id})
+        dispatch({ type: ActionType.ADD_MESSAGE, message: responseMessage })
+        dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: responseMessage.id })
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder()
@@ -60,9 +60,9 @@ export default function ChatInput() {
             done = result.done
             const chunk = decoder.decode(result.value)
             content += chunk
-            dispatch({type: ActionType.UPDATE_MESSAGE, message: {...responseMessage, content}})
+            dispatch({ type: ActionType.UPDATE_MESSAGE, message: { ...responseMessage, content } })
         }
-        dispatch({type: ActionType.UPDATE, fiel:'streamingId', value: ''})
+        dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: '' })
         // setMessageText('')
     }
     return (
@@ -91,6 +91,7 @@ export default function ChatInput() {
                     <Button
                         className="mx-3 !rounded-lg"
                         icon={FiSend}
+                        disabled={messageText.trim() === '' || streamingId !== ''}
                         variant="primary"
                         onClick={sendMessage}
                     />
