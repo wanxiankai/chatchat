@@ -7,12 +7,14 @@ import { useRef, useState } from "react";
 import { Message, MessageRequestBody } from "@/types/chat";
 import { useAppContext } from "@/components/AppContext";
 import { ActionType } from "@/reducers/AppReducer";
+import { useEventBusContext } from "@/components/EventBusContext";
 
 export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
     const { state: { messageList, currentModel, streamingId }, dispatch } = useAppContext()
     const stopRef = useRef(false)
     const chatIdRef = useRef('')
+    const { publish } = useEventBusContext()
 
     async function createOrUpdateMessage(message: Message) {
         const response = await fetch("/api/message/update", {
@@ -29,6 +31,7 @@ export default function ChatInput() {
         const { data } = await response.json()
         if (!chatIdRef.current) {
             chatIdRef.current = data.message.chatId
+            publish('fetchChatList')
         }
         return data.message
     }
