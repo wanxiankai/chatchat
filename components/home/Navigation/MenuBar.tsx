@@ -11,6 +11,9 @@ export default function MenuBar() {
             <Button
                 icon={HiPlus}
                 variant="outline"
+                onClick={() => {
+                    dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value: null})
+                }}
                 className="flex-1"
             >
                 新建对话

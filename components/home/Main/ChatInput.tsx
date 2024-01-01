@@ -41,6 +41,7 @@ export default function ChatInput() {
         if (!chatIdRef.current) {
             chatIdRef.current = data.message.chatId
             publish('fetchChatList')
+            dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value: {id: chatIdRef.current}})
         }
         return data.message
     }
