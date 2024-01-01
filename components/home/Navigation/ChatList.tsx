@@ -1,99 +1,46 @@
 "use client"
 import { groupByDate } from "@/common/util"
 import { Chat } from "@/types/chat"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import ChatItem from "./ChatItem"
 import { useEventBusContext } from "@/components/EventBusContext"
 
-const defaultListData: Chat[] = [
-    {
-        id: '1',
-        title: 'React1的新特性有哪些',
-        updateTime: Date.now()
-    },
-    {
-        id: '2',
-        title: 'React2的新特性有哪些,让我看看超长的效果是什么样的',
-        updateTime: Date.now() + 1
-    },
-    {
-        id: '3',
-        title: 'React3的新特性有哪些',
-        updateTime: Date.now() + 2
-    },
-    {
-        id: '4',
-        title: 'React4的新特性有哪些,让我看看超长的效果是什么样的',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 2
-    },
-    {
-        id: '5',
-        title: 'React5的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 2
-    },
-    {
-        id: '6',
-        title: 'React6的新特性有哪些,让我看看超长的效果是什么样的',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 30
-    },
-    {
-        id: '7',
-        title: 'React7的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 30
-    },
-    {
-        id: '8',
-        title: 'React8的新特性有哪些,让我看看超长的效果是什么样的',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 30
-    },
-    {
-        id: '9',
-        title: 'React9的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 30
-    },
-    {
-        id: '10',
-        title: 'React10的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 60
-    },
-    {
-        id: '11',
-        title: 'React11的新特性有哪些,让我看看超长的效果是什么样的',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 60
-    },
-    {
-        id: '12',
-        title: 'React12的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 60
-    },
-    {
-        id: '13',
-        title: 'React13的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 90
-    },
-    {
-        id: '14',
-        title: 'React14的新特性有哪些,让我看看超长的效果是什么样的',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 90
-    },
-    {
-        id: '15',
-        title: 'React15的新特性有哪些',
-        updateTime: Date.now() - 1000 * 60 * 60 * 24 * 90
-    },
-]
-
 export default function ChatList() {
-    const [chatList, setChatList] = useState<Chat[]>(defaultListData)
+    const [chatList, setChatList] = useState<Chat[]>([])
     const [selectedChat, setSelectedChat] = useState<Chat>()
+    const pageRef = useRef(1);
     const groupList = useMemo(() => {
         return groupByDate(chatList)
     }, [chatList])
     const { subscribe, unsubscribe } = useEventBusContext()
 
+    async function getData() {
+        console.log('getChatList')
+        const response = await fetch(`/api/list?page=${pageRef.current}`, {
+            method: "GET"
+        })
+        if (!response.ok) {
+            console.log('对话列表请求失败', response.statusText)
+            return
+        }
+        const { data } = await response.json()
+        if(pageRef.current === 1){
+            setChatList(data.list)
+        }else {
+            setChatList([...chatList,data.list])
+        }
+    }
+
+    useEffect(()=>{
+        console.log('effect')
+        getData();
+    },[])
+
     useEffect(() => {
         const callback: EventListener = () => {
             console.log('fetchChatList')
+            pageRef.current = 1;
+            getData()
         }
         subscribe('fetchChatList', callback)
         return () => unsubscribe('fetchChatList', callback)
