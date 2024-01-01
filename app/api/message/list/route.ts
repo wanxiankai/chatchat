@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const list = await prisma.message.findMany({
         where: { chatId },
         orderBy: {
-            createTime: "desc"
+            createTime: "asc"
         }
     })
     return NextResponse.json({ code: 0, data: { list } })
