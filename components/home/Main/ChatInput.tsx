@@ -14,21 +14,33 @@ export default function ChatInput() {
     const { state: { messageList, currentModel, streamingId }, dispatch } = useAppContext()
     const stopRef = useRef(false)
 
-    async function sendMessage() {
-        console.log('发送消息', messageText)
 
+    async function sendMessage() {
         const currentMessage: Message = {
             id: uuidV4(),
             role: 'user',
             content: messageText
         }
         const messages = messageList.concat([currentMessage]);
-        const requestBody: MessageRequestBody = { messages, model: currentModel }
-        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
-        dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
-        setMessageText('')
-        const controller = new AbortController();
+         // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
+         dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
+        toSend(messages)
+    }
 
+    async function reSendMessage() {
+        const messages = [...messageList];
+        if(messages.length !== 0 && messages[messages.length -1].role === 'assistant'){
+            dispatch({type:ActionType.REMOVE_MESSAGE, message: messages[messages.length -1]})
+        }
+        messages.splice(messages.length-1,1)
+        toSend(messages)
+    }
+
+    async function toSend(messages: Message[]) {
+        const requestBody: MessageRequestBody = { messages, model: currentModel }
+        setMessageText('')
+
+        const controller = new AbortController();
         const response = await fetch("/api/chat", {
             method: "POST",
             headers: {
@@ -59,7 +71,7 @@ export default function ChatInput() {
         let done = false;
         let content = ''
         while (!done) {
-            if(stopRef.current){
+            if (stopRef.current) {
                 stopRef.current = false;
                 controller.abort();
                 break;
@@ -93,6 +105,7 @@ export default function ChatInput() {
                         (<Button
                             icon={MdRefresh}
                             className="font-medium"
+                            onClick={reSendMessage}
                             variant="primary"
                         >
                             重新生成

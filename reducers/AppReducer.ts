@@ -12,10 +12,11 @@ export enum ActionType {
     UPDATE = "UPDATE",
     ADD_MESSAGE = "ADD_MESSAHE",
     UPDATE_MESSAGE = "UPDATE_MESSAHE",
+    REMOVE_MESSAGE = "REMOVE_MESSAGE"
 }
 
 type MessageAction = {
-    type: ActionType.ADD_MESSAGE | ActionType.UPDATE_MESSAGE,
+    type: ActionType.ADD_MESSAGE | ActionType.UPDATE_MESSAGE | ActionType.REMOVE_MESSAGE,
     message: Message
 }
 
@@ -52,6 +53,11 @@ export function reducer(state: State, action: Action) {
             })
             return { ...state, messageList }
         }
+        case ActionType.REMOVE_MESSAGE: {
+            const messageList =  state.messageList.filter((message) => message.id !== action.message.id)
+            return {...state, messageList}
+        }
+
         default:
             throw new Error()
     }
