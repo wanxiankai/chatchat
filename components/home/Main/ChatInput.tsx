@@ -4,37 +4,64 @@ import { PiLightningFill } from 'react-icons/pi'
 import { FiSend } from 'react-icons/fi'
 import TextareaAutoSize from 'react-textarea-autosize'
 import { useState } from "react";
+import { v4 as uuidV4 } from "uuid"
+import { Message, MessageRequestBody } from "@/types/chat";
+import { useAppContext } from "@/components/AppContext";
+import { ActionType } from "@/reducers/AppReducer";
 
 export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
+    const { state: { messageList, currentModel }, dispatch } = useAppContext()
 
-    async function sendMessage(){
+    async function sendMessage() {
         console.log('发送消息', messageText)
+
+        const currentMessage: Message = {
+            id: uuidV4(),
+            role: 'user',
+            content: messageText
+        }
+        const messages = messageList.concat([currentMessage]);
+        const requestBody: MessageRequestBody = { messages, model: currentModel }
+        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
+        dispatch({type: ActionType.ADD_MESSAGE, message: currentMessage})
+        setMessageText('')
+
         const response = await fetch("/api/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({messageText})
+            body: JSON.stringify(requestBody)
         })
-        if(!response.ok) {
+        if (!response.ok) {
             console.log(response.statusText)
             return
         }
-        if(!response.body){
+        if (!response.body) {
             console.log("body error")
             return
         }
+        const responseMessage: Message = {
+            id: uuidV4(),
+            role:'assistant',
+            content: ''
+        }
+
+        dispatch({type: ActionType.ADD_MESSAGE, message: responseMessage})
+
         const reader = response.body.getReader();
         const decoder = new TextDecoder()
         let done = false;
-        while(!done) {
+        let content = ''
+        while (!done) {
             const result = await reader.read()
             done = result.done
             const chunk = decoder.decode(result.value)
-            console.log(chunk)
+            content += chunk
+            dispatch({type: ActionType.UPDATE_MESSAGE, message: {...responseMessage, content}})
         }
-        setMessageText('')
+        // setMessageText('')
     }
     return (
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-b from-[rgba(255,255,255,0)] from-[13.94%] to-[#fff] to-[54.73%] pt-10 dark:from-[rgba(53,55,64,0)] dark:to-[#353740] dark:to-[58.85%]">
