@@ -3,7 +3,7 @@ import { MdRefresh } from 'react-icons/md'
 import { PiLightningFill, PiStopBold } from 'react-icons/pi'
 import { FiSend } from 'react-icons/fi'
 import TextareaAutoSize from 'react-textarea-autosize'
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { v4 as uuidV4 } from "uuid"
 import { Message, MessageRequestBody } from "@/types/chat";
 import { useAppContext } from "@/components/AppContext";
@@ -12,6 +12,7 @@ import { ActionType } from "@/reducers/AppReducer";
 export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
     const { state: { messageList, currentModel, streamingId }, dispatch } = useAppContext()
+    const stopRef = useRef(false)
 
     async function sendMessage() {
         console.log('发送消息', messageText)
@@ -26,12 +27,14 @@ export default function ChatInput() {
         // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
         dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
         setMessageText('')
+        const controller = new AbortController();
 
         const response = await fetch("/api/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
+            signal: controller.signal,
             body: JSON.stringify(requestBody)
         })
         if (!response.ok) {
@@ -56,6 +59,11 @@ export default function ChatInput() {
         let done = false;
         let content = ''
         while (!done) {
+            if(stopRef.current){
+                stopRef.current = false;
+                controller.abort();
+                break;
+            }
             const result = await reader.read()
             done = result.done
             const chunk = decoder.decode(result.value)
@@ -65,6 +73,7 @@ export default function ChatInput() {
         dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: '' })
         // setMessageText('')
     }
+
     return (
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-b from-[rgba(255,255,255,0)] from-[13.94%] to-[#fff] to-[54.73%] pt-10 dark:from-[rgba(53,55,64,0)] dark:to-[#353740] dark:to-[58.85%]">
             <div className="w-full max-w-4xl mx-auto flex flex-col items-center px-4 space-y-4">
@@ -73,6 +82,9 @@ export default function ChatInput() {
                         (<Button
                             icon={PiStopBold}
                             className="font-medium"
+                            onClick={() => {
+                                stopRef.current = true
+                            }}
                             variant="primary"
                         >
                             停止生成
