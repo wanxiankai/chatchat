@@ -1,9 +1,32 @@
 import { useAppContext } from "@/components/AppContext"
 import MarkDown from "@/components/common/MarkDown"
+import { ActionType } from "@/reducers/AppReducer";
+import { useEffect } from "react";
 import { SiOpenai } from 'react-icons/si'
 
 export default function MessageList() {
-    const { state: { messageList, streamingId } } = useAppContext();
+    const { state: { messageList, streamingId, selectedChat }, dispatch } = useAppContext();
+
+    async function getData(chatId: string) {
+        const response = await fetch(`/api/message/list?chatId=${chatId}`, {
+            method: "GET"
+        })
+        if (!response.ok) {
+            console.log('消息列表请求失败', response.statusText)
+            return
+        }
+        const { data } = await response.json()
+        dispatch({ type: ActionType.UPDATE, fiel: 'messageList', value: data.list })
+    }
+
+    useEffect(() => {
+        if (selectedChat) {
+            getData(selectedChat.id)
+        } else {
+            dispatch({ type: ActionType.UPDATE, fiel: 'messageList', value: [] })
+        }
+    }, [selectedChat])
+
     return (
         <div className="w-full pt-10 pb-48 dark:text-gray-300">
             <ul>
@@ -21,7 +44,7 @@ export default function MessageList() {
                                 <div className="text-3xl leading-[1]">
                                     {isUser ? "😊" : <SiOpenai />}
                                 </div>
-                                <div className="flex-1"><MarkDown>{`${message.content}${message.id === streamingId  ? '▍' : ''}`}</MarkDown></div>
+                                <div className="flex-1"><MarkDown>{`${message.content}${message.id === streamingId ? '▍' : ''}`}</MarkDown></div>
                             </div>
                         </li>
                     )

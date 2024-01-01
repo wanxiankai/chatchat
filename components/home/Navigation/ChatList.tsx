@@ -4,11 +4,14 @@ import { Chat } from "@/types/chat"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ChatItem from "./ChatItem"
 import { useEventBusContext } from "@/components/EventBusContext"
+import { useAppContext } from "@/components/AppContext"
+import { ActionType } from "@/reducers/AppReducer"
 
 export default function ChatList() {
     const [chatList, setChatList] = useState<Chat[]>([])
-    const [selectedChat, setSelectedChat] = useState<Chat>()
     const pageRef = useRef(1);
+    const { state: { selectedChat }, dispatch } = useAppContext()
+
     const groupList = useMemo(() => {
         return groupByDate(chatList)
     }, [chatList])
@@ -24,17 +27,17 @@ export default function ChatList() {
             return
         }
         const { data } = await response.json()
-        if(pageRef.current === 1){
+        if (pageRef.current === 1) {
             setChatList(data.list)
-        }else {
-            setChatList([...chatList,data.list])
+        } else {
+            setChatList([...chatList, data.list])
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log('effect')
         getData();
-    },[])
+    }, [])
 
     useEffect(() => {
         const callback: EventListener = () => {
@@ -58,7 +61,13 @@ export default function ChatList() {
                             {
                                 list.map((item) => {
                                     const selected = selectedChat?.id === item.id;
-                                    return <ChatItem key={item.id} item={item} selected={selected} onSelected={setSelectedChat} />
+                                    return <ChatItem 
+                                                key={item.id} 
+                                                item={item} 
+                                                selected={selected} 
+                                                onSelected={(chat) => {
+                                                    dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value: chat})
+                                                }} />
                                 })
                             }
                         </ul>
