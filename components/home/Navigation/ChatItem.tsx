@@ -23,7 +23,7 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
                 onSelected(item)
             }}
             key={item.id}
-            className={`relative group flex items-center p-3 space-x-3 cursor-pointer rounded-md hover:bg-gray-800 ${selected ? 'bg-gray-800 pr-[3.5em]' : ''}`}>
+            className={`relative group flex items-center p-3 mb-1 space-x-3 cursor-pointer rounded-md hover:bg-gray-800 ${selected ? 'bg-gray-800 pr-[3.5em]' : ''}`}>
             <div>
                 {deleting ? <PiTrashBold /> : <PiChatBold />}
             </div>
