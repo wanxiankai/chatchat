@@ -1,3 +1,4 @@
+import { useEventBusContext } from "@/components/EventBusContext"
 import { Chat } from "@/types/chat"
 import { useEffect, useState } from "react"
 import { AiOutlineEdit } from "react-icons/ai"
@@ -13,10 +14,33 @@ type ChatItemProps = {
 export default function ChatItem({ item, selected, onSelected }: ChatItemProps) {
     const [editing, setEditing] = useState(false)
     const [deleting, setDeleting] = useState(false)
+    const [title, setTitle] = useState(item.title)
+
+    const { publish } = useEventBusContext()
+
     useEffect(() => {
         setEditing(false)
         setDeleting(false)
     }, [selected])
+
+    async function updateChat(){
+        const response = await fetch("/api/chat/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({id: item.id, title})
+        })
+        if (!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        const { code } =await response.json()
+        if(code === 0) {
+            publish('fetchChatList')
+        }
+    }
+
     return (
         <li
             onClick={() => {
@@ -28,7 +52,15 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
                 {deleting ? <PiTrashBold /> : <PiChatBold />}
             </div>
             {editing ?
-                (<input className="flex-1 min-w-0 bg-transparent outline-none" autoFocus defaultValue={item.title} />)
+                (<input
+                    className="flex-1 min-w-0 bg-transparent outline-none"
+                    autoFocus
+                    value={title}
+                    onChange={(e) =>{
+                        setTitle(e.target.value)
+                    }}
+                />
+                )
                 :
                 (
                     <div className=" relative flex-1 whitespace-nowrap overflow-hidden">
@@ -38,14 +70,15 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
                 )}
             {selected && (
                 <div className="absolute right-1 flex">
-                    {editing || deleting?
+                    {editing || deleting ?
                         <>
                             <button
                                 onClick={(e) => {
-                                    if(deleting) {
+                                    if (deleting) {
                                         console.log('删除当前对话')
-                                    }else {
+                                    } else {
                                         console.log('编辑当前对话')
+                                        updateChat()
                                     }
                                     setEditing(false)
                                     setDeleting(false)
