@@ -1,4 +1,6 @@
+import { useAppContext } from "@/components/AppContext"
 import { useEventBusContext } from "@/components/EventBusContext"
+import { ActionType } from "@/reducers/AppReducer"
 import { Chat } from "@/types/chat"
 import { useEffect, useState } from "react"
 import { AiOutlineEdit } from "react-icons/ai"
@@ -17,27 +19,46 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
     const [title, setTitle] = useState(item.title)
 
     const { publish } = useEventBusContext()
+    const { dispatch} = useAppContext()
 
     useEffect(() => {
         setEditing(false)
         setDeleting(false)
     }, [selected])
 
-    async function updateChat(){
+    async function updateChat() {
         const response = await fetch("/api/chat/update", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({id: item.id, title})
+            body: JSON.stringify({ id: item.id, title })
         })
         if (!response.ok) {
             console.log(response.statusText)
             return
         }
-        const { code } =await response.json()
-        if(code === 0) {
+        const { code } = await response.json()
+        if (code === 0) {
             publish('fetchChatList')
+        }
+    }
+
+    async function deleteChat() {
+        const response = await fetch(`/api/chat/delete?id=${item.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        if (!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        const { code } = await response.json()
+        if (code === 0) {
+            publish('fetchChatList')
+            dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value:null})
         }
     }
 
@@ -56,7 +77,7 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
                     className="flex-1 min-w-0 bg-transparent outline-none"
                     autoFocus
                     value={title}
-                    onChange={(e) =>{
+                    onChange={(e) => {
                         setTitle(e.target.value)
                     }}
                 />
@@ -76,6 +97,7 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
                                 onClick={(e) => {
                                     if (deleting) {
                                         console.log('删除当前对话')
+                                        deleteChat();
                                     } else {
                                         console.log('编辑当前对话')
                                         updateChat()
