@@ -77,10 +77,14 @@ export default function ChatInput() {
             content,
             chatId: chatIdRef.current
         })
-        const messages = messageList.concat([currentMessage]);
-        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复， 然后清空输入框
+        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复，
         dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
+        const messages = messageList.concat([currentMessage]);
         toSend(messages)
+        if (!selectedChat?.title || selectedChat.title === '新对话') {
+            console.log('生成新的标题')
+            updateChatTitle(messages)
+        }
     }
 
     async function reSendMessage() {
@@ -95,6 +99,59 @@ export default function ChatInput() {
         }
         messages.splice(messages.length - 1, 1)
         toSend(messages)
+    }
+
+    async function updateChatTitle(messages: Message[]) {
+        const message: Message = {
+            id: '',
+            role: 'user',
+            content: "使用 5 到 10 个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，如果没有主题，请直接返回'新对话'",
+            chatId: chatIdRef.current
+        }
+        let chatId = chatIdRef.current;
+        const requestBody: MessageRequestBody = { messages: [...messages, message], model: currentModel }
+        let response = await fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        })
+        if (!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        if (!response.body) {
+            console.log("body error")
+            return
+        }
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder()
+        let done = false;
+        let title = ''
+        while (!done) {
+            const result = await reader.read()
+            done = result.done
+            const chunk = decoder.decode(result.value)
+            title += chunk
+        }
+
+        response = await fetch("/api/chat/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: chatId, title })
+        })
+        if (!response.ok) {
+            console.log(response.statusText)
+            return
+        }
+        const { code } = await response.json()
+        if (code === 0) {
+            publish('fetchChatList')
+        }
+
     }
 
     async function toSend(messages: Message[]) {
