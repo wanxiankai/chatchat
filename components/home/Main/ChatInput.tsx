@@ -8,22 +8,31 @@ import { useEffect, useRef, useState } from "react";
 import { Message, MessageRequestBody } from "@/types/chat";
 import { useAppContext } from "@/components/AppContext";
 import { ActionType } from "@/reducers/AppReducer";
-import { useEventBusContext } from "@/components/EventBusContext";
+import { useEventBusContext, EventListener } from "@/components/EventBusContext";
 
 export default function ChatInput() {
     const [messageText, setMessageText] = useState('')
     const { state: { messageList, currentModel, streamingId, selectedChat }, dispatch } = useAppContext()
     const stopRef = useRef(false)
     const chatIdRef = useRef('')
-    const { publish } = useEventBusContext()
+    const { subscribe, unsubscribe, publish } = useEventBusContext()
 
     useEffect(() => {
-        if(chatIdRef.current === selectedChat?.id){
+        const callback: EventListener = (data: string) => {
+            sendMessage(data)
+        }
+        subscribe('createNewChat', callback)
+        return () => unsubscribe('createNewChat', callback)
+    }, [])
+
+
+    useEffect(() => {
+        if (chatIdRef.current === selectedChat?.id) {
             return
         }
         chatIdRef.current = selectedChat?.id ?? ""
         stopRef.current = true
-    },[selectedChat])
+    }, [selectedChat])
 
     async function createOrUpdateMessage(message: Message) {
         const response = await fetch("/api/message/update", {
@@ -41,7 +50,7 @@ export default function ChatInput() {
         if (!chatIdRef.current) {
             chatIdRef.current = data.message.chatId
             publish('fetchChatList')
-            dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value: {id: chatIdRef.current}})
+            dispatch({ type: ActionType.UPDATE, fiel: 'selectedChat', value: { id: chatIdRef.current } })
         }
         return data.message
     }
@@ -61,11 +70,11 @@ export default function ChatInput() {
         return code === 0
     }
 
-    async function sendMessage() {
+    async function sendMessage(content: string) {
         const currentMessage = await createOrUpdateMessage({
             id: '',
             role: 'user',
-            content: messageText,
+            content,
             chatId: chatIdRef.current
         })
         const messages = messageList.concat([currentMessage]);
@@ -183,7 +192,9 @@ export default function ChatInput() {
                         icon={FiSend}
                         disabled={messageText.trim() === '' || streamingId !== ''}
                         variant="primary"
-                        onClick={sendMessage}
+                        onClick={() => {
+                            sendMessage(messageText)
+                        }}
                     />
                 </div>
                 <footer className="text-center text-sm text-gray-700 dark:text-gray-300 px-4 pb-6">
