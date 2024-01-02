@@ -2,9 +2,9 @@
 以ChatGPT 为模板，使用Nextjs克隆一个ChatGPT App，主要以学习为主。
 
 ## 技术栈
-- Nextjs
-- Taildwind CSS
-- Prisma
+- [Nextjs](https://nextjs.org/docs)
+- [Taildwind CSS](https://tailwindcss.com/docs/installation)
+- [Prisma](https://www.prisma.io/docs)
 - Sqlite
 
 ## 注意：
