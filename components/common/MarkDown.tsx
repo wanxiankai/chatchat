@@ -1,42 +1,73 @@
-import { memo } from 'react'
-import ReactMarkDown, { Options } from 'react-markdown'
+/* eslint-disable react/display-name */
+'use client'
+import { DetailedHTMLProps, HTMLAttributes, memo } from 'react'
+import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
+import { codeLanguageSubset } from '@/constant/chat';
+import { CodeProps, ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
+import CodeBlock from './CodeBlock';
+import ReactMarkdown from 'react-markdown';
 
-function MarkDown({ children, className = '', ...props }: Options) {
+
+const MarkDown = memo(({ content }: { content: string }) => {
     return (
-        <ReactMarkDown
-            components={{
-                code({ node, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || "")
-                    return match ? (
-                        <SyntaxHighlighter
-                            style={a11yDark}
-                            language={match?.[1] ?? ""}
-                            PreTag='div'
-                        >
-                            {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                    ) : (
-                        <code
-                            {...props}
-                            className={className}
-                        >
-                            {children}
-                        </code>
-                    )
-                }
-            }}
-
-
-            remarkPlugins={[remarkGfm]}
-            className={`markdown prose dark:prose-invert ${className}`}
-            {...props}
-        >
-            {children}
-        </ReactMarkDown>
+        <div className='markdown prose break-words !text-sm'>
+            <ReactMarkdown
+                remarkPlugins={[
+                    remarkGfm,
+                    [remarkMath, { singleDollarTextMath: false }],
+                ]}
+                rehypePlugins={[
+                    rehypeKatex,
+                    [
+                        rehypeHighlight,
+                        {
+                            detect: true,
+                            ignoreMissing: true,
+                            subset: codeLanguageSubset,
+                        },
+                    ],
+                ]}
+                linkTarget='_new'
+                components={{
+                    code,
+                    p,
+                }}
+            >
+                {content}
+            </ReactMarkdown>
+        </div>
     )
 }
+)
 
-export default memo(MarkDown)
+const code = memo((props: CodeProps) => {
+    const { inline, className, children } = props;
+    const match = /language-(\w+)/.exec(className || '');
+    const lang = match && match[1];
+
+    if (inline) {
+        return <code className={className}>{children}</code>;
+    } else {
+        return <CodeBlock lang={lang || 'text'} codeChildren={children} />;
+    }
+});
+
+const p = memo(
+    (
+        props?: Omit<
+            DetailedHTMLProps<
+                HTMLAttributes<HTMLParagraphElement>,
+                HTMLParagraphElement
+            >,
+            'ref'
+        > &
+            ReactMarkdownProps
+    ) => {
+        return <p className='whitespace-pre-wrap'>{props?.children}</p>;
+    }
+);
+
+export default MarkDown
