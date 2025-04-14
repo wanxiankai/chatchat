@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@azure/openai": "1.0.0-beta.8",
     "@google/genai": "^0.8.0",
     "@prisma/client": "5.7.1",
     "next": "14.0.4",
+    "openai": "^4.93.0",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4.12.0",
