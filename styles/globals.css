@@ -41,3 +41,18 @@ html, body {
 .dark::-webkit-scrollbar-thumb:hover {
     background-color: rgb(172, 172, 190);
 }
+
+@media (max-width: 640px) {
+    .code-copy-button {
+      display: none; /* 在小屏幕上隐藏复制按钮 */
+    }
+    
+    .ai-chat-message {
+      font-size: 0.9rem; /* 小屏幕字体调整 */
+    }
+    
+    .ai-chat-message pre {
+      padding: 0.75rem;
+    }
+  }
+  

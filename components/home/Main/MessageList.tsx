@@ -1,5 +1,5 @@
 import { useAppContext } from "@/components/AppContext"
-import MarkDown from "@/components/common/MarkDown";
+import AIChatMessage from "@/components/common/AIChatMessage";
 import { ActionType } from "@/reducers/AppReducer";
 import { useEffect } from "react";
 import { SiOpenai } from 'react-icons/si'
@@ -44,7 +44,7 @@ export default function MessageList() {
                                     <div className="text-3xl leading-[1]">
                                         {isUser ? "😊" : <SiOpenai />}
                                     </div>
-                                    <div className="flex-1"><MarkDown content={`${message.content}${message.id === streamingId ? '▍' : ''}`} /></div>
+                                    <div className="flex-1"><AIChatMessage message={message.content} /></div>
                                 </div>
                             </li>
                         )
