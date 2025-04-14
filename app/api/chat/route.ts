@@ -1,36 +1,50 @@
-import { sleep } from "@/common/util";
-import client from "@/lib/openai";
+import geminiai from "@/lib/gemini";
+
 import { MessageRequestBody } from "@/types/chat";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
     const { messages, model } = (await request.json()) as MessageRequestBody;
     const encoder = new TextEncoder();
+    
+    // Convert messages array to Gemini format
+    const geminiMessages = messages.map(message => ({
+        role: message.role === 'user' ? 'user' : 'model',
+        parts: [{text: message.content}]
+    }));
+    
+    // Create a readable stream that will receive chunks from Gemini API
     const stream = new ReadableStream({
         async start(controller) {
-            // 接入Azure openAI 代码实现
-            // const events = client.listChatCompletions(model, 
-            //     [{role: 'system', content:"You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."},...messages],
-            //     { maxTokens: 1024 });
-            // for await (const event of events) {
-            //     for (const choice of event.choices) {
-            //         const delta = choice.delta?.content;
-            //         if (delta) {
-            //             console.log(`Chatbot: ${delta}`);
-            //             controller.enqueue(encoder.encode(delta))
-            //         }
-            //     }
-            // }
-            // controller.close();
-
-            // 模拟代码实现
-            const messageText = messages[messages.length -1].content;
-            for (let i = 0; i < messageText.length; i++) {
-                await sleep(100)
-                controller.enqueue(encoder.encode(messageText[i]))
+            try {
+                // Start the streaming request to Gemini
+                const response = await geminiai.models.generateContentStream({
+                    model: "gemini-2.0-flash",
+                    contents: geminiMessages,
+                });
+                
+                // Process each chunk as it arrives
+                for await (const chunk of response) {
+                    if (chunk.text) {
+                        controller.enqueue(encoder.encode(chunk.text));
+                    }
+                }
+                
+                // Close the stream when done
+                controller.close();
+            } catch (error) {
+                console.error("Error streaming from Gemini:", error);
+                controller.error(error);
             }
-            controller.close();
         }
     });
-    return new Response(stream)
+    
+    // Return the stream as the response
+    return new Response(stream, {
+        headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    });
 }
