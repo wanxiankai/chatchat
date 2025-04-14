@@ -1,8 +1,8 @@
-import { OpenAIClient, AzureKeyCredential } from "@azure/openai"
+import OpenAI from "openai";
 
-const client = new OpenAIClient(
-    process.env.AZURE_ENDPOINT!,
-    new AzureKeyCredential(process.env.AZURE_API_KEY!)
-);
+const openaiClient = new OpenAI({
+    apiKey: process.env.GROK_API_KEY,
+    baseURL: process.env.GROK_BASE_URL
+});
 
-export default client;
+export default openaiClient;
