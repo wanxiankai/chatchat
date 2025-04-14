@@ -243,6 +243,12 @@ export default function ChatInput() {
                         onChange={(e) => {
                             setMessageText(e.target.value)
                         }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault()
+                                sendMessage(messageText)
+                            }
+                        }}
                     />
                     <Button
                         className="mx-3 !rounded-lg"
