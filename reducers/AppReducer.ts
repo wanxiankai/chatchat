@@ -32,7 +32,7 @@ export type Action = UpdateAction | MessageAction
 export const initialState: State = {
     displayNavigation: true,
     themeMode: 'light',
-    currentModel: 'gpt-35-turbo',
+    currentModel: 'gemini-2.0-flash',
     messageList: [],
     streamingId: '',
 }
