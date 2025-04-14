@@ -1,0 +1,52 @@
+.ai-chat-message {
+    font-size: 1rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }
+  
+  .ai-chat-message pre {
+    position: relative;
+    overflow-x: auto;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 0.375rem;
+    background-color: #282c34;
+  }
+  
+  .code-copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .code-copy-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* 为代码块增加更好的样式 */
+  .ai-chat-message code {
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  }
+  
+  /* 为内联代码增加样式 */
+  .ai-chat-message :not(pre) > code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+  
+  /* 暗模式样式 */
+  @media (prefers-color-scheme: dark) {
+    .ai-chat-message :not(pre) > code {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  
