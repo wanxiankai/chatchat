@@ -24,7 +24,7 @@ export default function Example() {
                             <li key={item.act}>
                                 <Button
                                 onClick={()=>{
-                                    publish('createNewChat', item.prompt)                 
+                                    publish('createNewPrompt', item.prompt)                 
                                 }}
                                 >
                                     {item.act}

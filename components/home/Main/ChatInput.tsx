@@ -19,10 +19,10 @@ export default function ChatInput() {
 
     useEffect(() => {
         const callback: EventListener = (data: string) => {
-            sendMessage(data)
+            setMessageText(data)
         }
-        subscribe('createNewChat', callback)
-        return () => unsubscribe('createNewChat', callback)
+        subscribe('createNewPrompt', callback)
+        return () => unsubscribe('createNewPrompt', callback)
     }, [])
 
 
