@@ -1,12 +1,20 @@
 import { useAppContext } from "@/components/AppContext"
 import AIChatMessage from "@/components/common/AIChatMessage";
 import { ActionType } from "@/reducers/AppReducer";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { SiOpenai } from 'react-icons/si'
 
 export default function MessageList() {
+    const messagesEndRef = useRef<HTMLDivElement>(null);
     const { state: { messageList, streamingId, selectedChat }, dispatch } = useAppContext();
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      };
+    useEffect(() => {
+        scrollToBottom();
+    }, [messageList]);
+    
     async function getData(chatId: string) {
         const response = await fetch(`/api/message/list?chatId=${chatId}`, {
             method: "GET"
@@ -44,11 +52,12 @@ export default function MessageList() {
                                     <div className="text-3xl leading-[1]">
                                         {isUser ? "😊" : <SiOpenai />}
                                     </div>
-                                    <div className="flex-1"><AIChatMessage message={message.content} /></div>
+                                    <div className="flex-1"><AIChatMessage message={message.content} isStreaming={Boolean(streamingId)} /></div>
                                 </div>
                             </li>
                         )
                     })}
+                    <div ref={messagesEndRef} />
                 </ul>
         </div>
     )
