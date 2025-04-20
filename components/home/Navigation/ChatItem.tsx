@@ -46,7 +46,7 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
 
     async function deleteChat() {
         const response = await fetch(`/api/chat/delete?id=${item.id}`, {
-            method: "POST",
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
             },
