@@ -12,7 +12,7 @@ export default function ToolBar() {
                 icon={themeMode === 'light' ? MdLightMode : MdDarkMode}
                 variant="text"
                 onClick={() => {
-                    dispatch({ type: ActionType.UPDATE, fiel: 'themeMode', value: themeMode === 'dark' ? 'light' : 'dark' })
+                    dispatch({ type: ActionType.UPDATE, field: 'themeMode', value: themeMode === 'dark' ? 'light' : 'dark' })
                 }}
             />
             <Button

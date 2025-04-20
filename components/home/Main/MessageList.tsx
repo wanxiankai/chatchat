@@ -23,14 +23,14 @@ export default function MessageList() {
             return
         }
         const { data } = await response.json()
-        dispatch({ type: ActionType.UPDATE, fiel: 'messageList', value: data.list })
+        dispatch({ type: ActionType.UPDATE, field: 'messageList', value: data.list })
     }
 
     useEffect(() => {
         if (selectedChat) {
             getData(selectedChat.id)
         } else {
-            dispatch({ type: ActionType.UPDATE, fiel: 'messageList', value: [] })
+            dispatch({ type: ActionType.UPDATE, field: 'messageList', value: [] })
         }
     }, [selectedChat])
 

@@ -12,7 +12,7 @@ export default function MenuBar() {
                 icon={HiPlus}
                 variant="outline"
                 onClick={() => {
-                    dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value: null})
+                    dispatch({type: ActionType.UPDATE, field:'selectedChat', value: null})
                 }}
                 className="flex-1"
             >
@@ -22,7 +22,7 @@ export default function MenuBar() {
                 icon={LuPanelLeft}
                 variant="outline"
                 onClick={() => {
-                    dispatch({type: ActionType.UPDATE, fiel:'displayNavigation', value: false})
+                    dispatch({type: ActionType.UPDATE, field:'displayNavigation', value: false})
                 }}
             />
         </div>)

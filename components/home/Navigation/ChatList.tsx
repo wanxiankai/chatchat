@@ -94,7 +94,7 @@ export default function ChatList() {
                                         item={item}
                                         selected={selected}
                                         onSelected={(chat) => {
-                                            dispatch({ type: ActionType.UPDATE, fiel: 'selectedChat', value: chat })
+                                            dispatch({ type: ActionType.UPDATE, field: 'selectedChat', value: chat })
                                         }} />
                                 })
                             }

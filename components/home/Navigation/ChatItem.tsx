@@ -58,7 +58,7 @@ export default function ChatItem({ item, selected, onSelected }: ChatItemProps) 
         const { code } = await response.json()
         if (code === 0) {
             publish('fetchChatList')
-            dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value:null})
+            dispatch({type: ActionType.UPDATE, field:'selectedChat', value:null})
         }
     }
 

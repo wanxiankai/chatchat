@@ -23,7 +23,7 @@ type MessageAction = {
 
 type UpdateAction = {
     type: ActionType.UPDATE,
-    fiel: string,
+    field: string,
     value: any
 }
 
@@ -40,7 +40,7 @@ export const initialState: State = {
 export function reducer(state: State, action: Action) {
     switch (action.type) {
         case ActionType.UPDATE:
-            return { ...state, [action.fiel]: action.value }
+            return { ...state, [action.field]: action.value }
         case ActionType.ADD_MESSAGE: {
             const messageList = state.messageList.concat([action.message])
             return { ...state, messageList }
