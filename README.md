@@ -20,7 +20,7 @@ ChatChat is a ai-chat application built with Next.js, Tailwind CSS, Clerk, Prism
 # Getting Started
 ## 1. Clone the repository
 ```bash
-git clone git@github.com:wanxiankai/chatgpt-app-clone.git
+git clone git@github.com:wanxiankai/chatchat.git
 ```
 
 ## 2. Install dependencies
