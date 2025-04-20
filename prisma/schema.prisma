@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -16,9 +16,11 @@ generator client {
 model Chat {
   id         String    @id @default(uuid())
   title      String
+  userid     String?
   message    Message[]
   updateTime DateTime  @updatedAt
   createTime DateTime  @default(now())
+
   @@map("chats")
 }
 
@@ -28,7 +30,8 @@ model Message {
   role       String
   createTime DateTime @default(now())
   updateTime DateTime @updatedAt
-  chatId     String   @map("chat_id") 
+  chatId     String   @map("chat_id")
   chat       Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
   @@map("messages")
 }

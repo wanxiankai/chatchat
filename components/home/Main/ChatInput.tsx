@@ -80,10 +80,10 @@ export default function ChatInput() {
         // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复，
         dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
         const messages = messageList.concat([currentMessage]);
-        toSend(messages)
+        await toSend(messages)
         if (!selectedChat?.title || selectedChat.title === '新对话') {
             console.log('生成新的标题')
-            updateChatTitle(messages)
+            await updateChatTitle(messages)
         }
     }
 
@@ -268,7 +268,7 @@ export default function ChatInput() {
                     >
                         wanxiankai
                     </a>
-                    .&nbsp;基于第三方提供的接口
+                    &nbsp; Personal Open Source Project
                 </footer>
             </div>
         </div>

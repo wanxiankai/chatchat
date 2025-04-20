@@ -1,10 +1,28 @@
+'use client'
+import { useAppContext } from '@/components/AppContext'
 import AuthFooter from '@/components/common/AuthFooter'
 import Logo from '@/components/common/Logo'
 import TypingCarousel from '@/components/common/TypingCarousel'
 import VideoBackground from '@/components/common/VideoBackground'
+import { ActionType } from '@/reducers/AppReducer'
 import { SignIn } from '@clerk/nextjs'
+import { useEffect } from 'react'
 
 export default function Page() {
+  const { dispatch } = useAppContext()
+  
+  const clearStore = () => {
+    dispatch({ type: ActionType.UPDATE, field: 'messageList', value: [] })
+    dispatch({ type: ActionType.UPDATE, field: 'selectedChat', value: undefined })
+    dispatch({ type: ActionType.UPDATE, field: 'streamingId', value: '' })
+  }
+
+  useEffect(() => {
+    clearStore();
+  }, [])
+
+
+
   return (
     <div className="flex h-screen">
       <Logo />
