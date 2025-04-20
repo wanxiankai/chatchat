@@ -268,7 +268,7 @@ export default function ChatInput() {
                     >
                         wanxiankai
                     </a>
-                    &nbsp; Personel Open Source Project
+                    &nbsp; Personal Open Source Project
                 </footer>
             </div>
         </div>
