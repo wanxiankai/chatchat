@@ -30,7 +30,7 @@ export default function ModelSelect() {
                             onClick={() => {
                                 dispatch({
                                     type: ActionType.UPDATE,
-                                    fiel: 'currentModel',
+                                    field: 'currentModel',
                                     value: item.id
                                 })
                             }}

@@ -12,7 +12,7 @@ export default function Menu() {
             variant="outline"
             className={`${displayNavigation ? 'hidden' : ''} fixed left-2 top-2`}
             onClick={() => {
-                dispatch({ type: ActionType.UPDATE, fiel: 'displayNavigation', value: true })
+                dispatch({ type: ActionType.UPDATE, field: 'displayNavigation', value: true })
             }}
         />)
 }
