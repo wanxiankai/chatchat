@@ -50,7 +50,7 @@ export default function ChatInput() {
         if (!chatIdRef.current) {
             chatIdRef.current = data.message.chatId
             publish('fetchChatList')
-            dispatch({ type: ActionType.UPDATE, fiel: 'selectedChat', value: { id: chatIdRef.current } })
+            dispatch({ type: ActionType.UPDATE, field: 'selectedChat', value: { id: chatIdRef.current } })
         }
         return data.message
     }
@@ -89,7 +89,7 @@ export default function ChatInput() {
 
     async function reSendMessage() {
         const messages = [...messageList];
-        if (messages.length !== 0 && messages[messages.length - 1].role !== 'user') {
+        if (messages.length !== 0 && messages[messages.length - 1].role === 'assistant') {
             const result = await deleteMessage(messages[messages.length - 1].id)
             if (!result) {
                 console.log('删除消息失败！')
@@ -150,7 +150,7 @@ export default function ChatInput() {
         const { code } = await response.json()
         if (code === 0) {
             publish('fetchChatList')
-            dispatch({type: ActionType.UPDATE, fiel:'selectedChat', value:{ id: chatId, title }})
+            dispatch({type: ActionType.UPDATE, field:'selectedChat', value:{ id: chatId, title }})
         }
 
     }
@@ -185,7 +185,7 @@ export default function ChatInput() {
         })
 
         dispatch({ type: ActionType.ADD_MESSAGE, message: responseMessage })
-        dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: responseMessage.id })
+        dispatch({ type: ActionType.UPDATE, field: 'streamingId', value: responseMessage.id })
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder()
@@ -203,7 +203,7 @@ export default function ChatInput() {
             dispatch({ type: ActionType.UPDATE_MESSAGE, message: { ...responseMessage, content } })
         }
         createOrUpdateMessage({ ...responseMessage, content })
-        dispatch({ type: ActionType.UPDATE, fiel: 'streamingId', value: '' })
+        dispatch({ type: ActionType.UPDATE, field: 'streamingId', value: '' })
         // setMessageText('')
     }
 
