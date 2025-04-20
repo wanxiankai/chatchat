@@ -10,15 +10,17 @@ import { useEffect } from 'react'
 
 export default function Page() {
   const { dispatch } = useAppContext()
-  useEffect(() => {
-    clearStore();
-  }, [])
-
+  
   const clearStore = () => {
     dispatch({ type: ActionType.UPDATE, field: 'messageList', value: [] })
     dispatch({ type: ActionType.UPDATE, field: 'selectedChat', value: undefined })
     dispatch({ type: ActionType.UPDATE, field: 'streamingId', value: '' })
   }
+
+  useEffect(() => {
+    clearStore();
+  }, [])
+
 
 
   return (
