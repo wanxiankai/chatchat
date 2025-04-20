@@ -5,7 +5,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Typist from 'react-typist-component';
 
-const phrases = ['Two Free Model', 'GPT Style', 'Open Source', 'Chat with AI', 'AI Assistant'];
+const phrases = ['Free To Use', 'Open Source', 'Chat with AI'];
 
 const TypingCarousel: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
