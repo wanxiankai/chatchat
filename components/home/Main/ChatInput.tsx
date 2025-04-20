@@ -268,7 +268,7 @@ export default function ChatInput() {
                     >
                         wanxiankai
                     </a>
-                    .&nbsp;基于第三方提供的接口
+                    &nbsp; Personel Open Source Project
                 </footer>
             </div>
         </div>
