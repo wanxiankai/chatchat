@@ -6,7 +6,6 @@ export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect()
   }
-  console.log('Middleware triggered')
 })
 
 export const config = {
