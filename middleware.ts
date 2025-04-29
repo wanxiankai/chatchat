@@ -1,41 +1,37 @@
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-// 使用 NextAuth 中间件保护路由
-export default withAuth(
-  function middleware(req) {
-    // 添加服务器端安全标头
-    const response = NextResponse.next();
-    
-    // 设置安全标头
-    response.headers.set("X-Content-Type-Options", "nosniff");
-    response.headers.set("X-Frame-Options", "DENY");
-    response.headers.set("X-XSS-Protection", "1; mode=block");
-    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-    response.headers.set(
-      "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self' https:; connect-src 'self' https:;"
-    );
-    
-    return response;
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: "/sign-in",
-    },
+export async function middleware(req: NextRequest) {
+  // Retrieve the token using the secret
+  // Ensure NEXTAUTH_SECRET is set in your environment variables
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const { pathname } = req.nextUrl;
+
+  // If the user is trying to access the root path ('/') and is not authenticated (no token)
+  if (pathname === '/' && !token) {
+    // Clone the URL and redirect to the sign-in page
+    const signInUrl = req.nextUrl.clone();
+    signInUrl.pathname = '/sign-in';
+    console.log('Middleware: Redirecting unauthenticated user from / to /sign-in');
+    return NextResponse.redirect(signInUrl);
   }
-);
 
-// 配置需要保护的路由
+  // Optional: If the user is authenticated and tries to access the sign-in page, redirect them to the root
+  if (pathname === '/sign-in' && token) {
+    const rootUrl = req.nextUrl.clone();
+    rootUrl.pathname = '/';
+    console.log('Middleware: Redirecting authenticated user from /sign-in to /');
+    return NextResponse.redirect(rootUrl);
+  }
+
+  // If none of the above conditions are met, allow the request to proceed
+  return NextResponse.next();
+}
+
+// Configure the matcher to specify which paths this middleware should run on.
+// We only need to check the root ('/') and the sign-in page ('/sign-in').
+// Other paths like API routes or static files are ignored by default unless matched here.
 export const config = {
-  matcher: [
-    // 所有聊天页面需要认证
-    "/chat/:path*",
-    // 所有API路由需要认证，除了登录认证API
-    "/api/:path*",
-    "/((?!sign-in|api/auth).*)",
-  ],
-};
+  matcher: ['/', '/sign-in'],
+}
