@@ -1,8 +1,7 @@
-import { GoogleGenAI } from "@google/genai"; // Correct package based on latest docs
+import { GoogleGenAI } from "@google/genai";
 
 const geminiai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY,
-    timeout: 60000 // 添加60秒超时
+    apiKey: process.env.GOOGLE_API_KEY
 });
 
 export default geminiai;

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from './auth'
 
 // 创建Prisma实例
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
