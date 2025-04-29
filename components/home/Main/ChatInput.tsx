@@ -71,14 +71,17 @@ export default function ChatInput() {
     }
 
     async function sendMessage(content: string) {
-        const currentMessage = await createOrUpdateMessage({
+        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复
+        const currentUserMessage = {
             id: '',
             role: 'user',
             content,
             chatId: chatIdRef.current
-        })
-        // 先将当前Message 添加到列表，更新试图，然后再调用接口显示回复，
-        dispatch({ type: ActionType.ADD_MESSAGE, message: currentMessage })
+        }
+        setMessageText('')
+        dispatch({ type: ActionType.ADD_MESSAGE, message: currentUserMessage })
+
+        const currentMessage = await createOrUpdateMessage(currentUserMessage)
         const messages = messageList.concat([currentMessage]);
         await toSend(messages)
         if (!selectedChat?.title || selectedChat.title === '新对话') {
@@ -113,7 +116,8 @@ export default function ChatInput() {
         let response = await fetch("/api/chat", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Accept": "text/event-stream",
             },
             body: JSON.stringify(requestBody)
         })
@@ -150,7 +154,7 @@ export default function ChatInput() {
         const { code } = await response.json()
         if (code === 0) {
             publish('fetchChatList')
-            dispatch({type: ActionType.UPDATE, field:'selectedChat', value:{ id: chatId, title }})
+            dispatch({ type: ActionType.UPDATE, field: 'selectedChat', value: { id: chatId, title } })
         }
 
     }
@@ -158,13 +162,13 @@ export default function ChatInput() {
     async function toSend(messages: Message[]) {
         stopRef.current = false;
         const requestBody: MessageRequestBody = { messages, model: currentModel }
-        setMessageText('')
 
         const controller = new AbortController();
         const response = await fetch("/api/chat", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Accept": "text/event-stream",
             },
             signal: controller.signal,
             body: JSON.stringify(requestBody)
