@@ -13,8 +13,8 @@ export default function Example() {
         return examples.slice(0, 15)
     }, [showFull])
     return (
-        <>
-            <div className='mt-20 mb-4 text-4xl'>
+        <div className='flex flex-col items-center'>
+            <div className='mt-10 mb-4 text-4xl'>
                 <MdOutlineTipsAndUpdates />
             </div>
             <ul className='flex justify-center flex-wrap gap-3.5'>
@@ -49,6 +49,6 @@ export default function Example() {
                     </div>
                 </>
             )}
-        </>
+        </div>
     )
 }
