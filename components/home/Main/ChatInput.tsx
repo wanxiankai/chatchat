@@ -272,7 +272,7 @@ export default function ChatInput() {
                     >
                         wanxiankai
                     </a>
-                    &nbsp; Personal Open Source Project
+                    &nbsp; <a href="https://github.com/wanxiankai/chatchat" target="_blank">Personal Open Source Project</a>
                 </footer>
             </div>
         </div>
