@@ -35,11 +35,18 @@ export async function GET(request: NextRequest) {
         });
         
         const hasMore = count > page * 20;
-        const res = NextResponse.json({ code: 0, data: { list, hasMore } });
-        res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate,');
-        res.headers.set('Pragma', 'no-cache');
-        res.headers.set('Expires', '0');
-        return 
+        return new NextResponse(
+            JSON.stringify({ code: 0, data: { list, hasMore } }),
+            {
+              status: 200,
+              headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store, no-cache, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+              },
+            }
+          );
     } catch (error) {
         // 提供详细的错误信息，帮助诊断问题
         console.error('[Chat List API] 错误详情:', error);
