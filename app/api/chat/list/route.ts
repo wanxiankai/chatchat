@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
     // 在生产构建阶段跳过数据库操作
-    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
-        return NextResponse.json({ code: 0, data: { list: [], hasMore: false } });
-    }
+    // if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
+    //     return NextResponse.json({ code: 0, data: { list: [], hasMore: false } });
+    // }
     
     try {
         const { prisma, userId } = await getUserPrisma();
