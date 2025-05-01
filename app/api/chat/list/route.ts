@@ -1,11 +1,12 @@
 import { getUserPrisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
     // 在生产构建阶段跳过数据库操作
-    // if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
-    //     return NextResponse.json({ code: 0, data: { list: [], hasMore: false } });
-    // }
+    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
+        return NextResponse.json({ code: 0, data: { list: [], hasMore: false } });
+    }
     
     try {
         const { prisma, userId } = await getUserPrisma();
@@ -34,7 +35,11 @@ export async function GET(request: NextRequest) {
         });
         
         const hasMore = count > page * 20;
-        return NextResponse.json({ code: 0, data: { list, hasMore } });
+        const res = NextResponse.json({ code: 0, data: { list, hasMore } });
+        res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate,');
+        res.headers.set('Pragma', 'no-cache');
+        res.headers.set('Expires', '0');
+        return 
     } catch (error) {
         // 提供详细的错误信息，帮助诊断问题
         console.error('[Chat List API] 错误详情:', error);
